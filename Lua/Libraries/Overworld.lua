@@ -502,6 +502,30 @@ return (function()
 
     -- Main update function of the module
     function self.Update()
+		if self.transfrombattle then
+			if not self.transdir then
+				self.backcover.alpha = self.backcover.alpha + 0.05
+				if self.backcover.alpha >= 1 then
+					self.backcover.alpha = 1
+					self.roomcoverlayer.alpha = 1
+					self.transdir = true
+					self.inbattle = false
+					self.transtobattle = false
+					OWCamera.MoveTo(self.precamera[1], self.precamera[2])
+					self.showmap()
+					self.player.sprite.alpha = 1
+					self.player.loaded = true
+					self.player.sprite.layer = "AboveBulletDark"
+                    Audio.LoadFile(music)
+				end
+			else
+				if (self.roomcoverlayer.alpha > 0) then
+					self.roomcoverlayer.alpha = self.roomcoverlayer.alpha - 0.05
+				else
+					self.transfrombattle = false
+				end
+			end
+		end
         if self.transtobattle then
             if self.transtobattletype == 0 then
                 self.UpdateCYFTransition()
@@ -871,6 +895,19 @@ return (function()
             self.currentmap.events[x].sprite.alpha = 0
         end
     end
+	
+	-- Take a guess
+    function self.showmap()
+        for y = 1, #self.currentmap.map[1] do
+            for x = 1, #self.currentmap.map do
+                self.tilemap[x][y].alpha = 1
+            end
+        end
+        self.backcover.alpha = 1
+        for x = 1, #self.currentmap.events do
+            self.currentmap.events[x].sprite.alpha = 1
+        end
+    end
 
     -- Unloads the current map
     function self.unloadmap()
@@ -930,6 +967,7 @@ return (function()
         self.transtoenemysprite = CreateSprite(enemydata[1],"SuperTop")
         self.transtoenemysprite.MoveTo(enemydata[2]+OWCamera.x,enemydata[3]+OWCamera.y)
         self.movetotimer = 20
+		self.precamera = {OWCamera.x,OWCamera.y}
 
         self.oldcykbgy = CYK.Background[1]["startY"]
         self.oldcykbgy2 = CYK.Background[2]["startY"]
@@ -950,6 +988,7 @@ return (function()
         self.fakesoul.layer = "SuperTop"
         self.fakesoul.MoveToAbs(Player.absx,Player.absy)
         self.fakesoul.alpha = 1
+		self.precamera = {OWCamera.x,OWCamera.y}
         Player.MoveToAbs(Player.absx-OWCamera.x,Player.absy-OWCamera.y,true)
         self.fakesoul.MoveTo(self.fakesoul.x-OWCamera.x,self.fakesoul.y-OWCamera.y)
         self.player.sprite.x = self.player.sprite.x-OWCamera.x
@@ -976,7 +1015,6 @@ return (function()
         end
         Audio.Stop()
         Audio.LoadFile(music)
-        self.precamera = {OWCamera.x,OWCamera.y}
         if self.deltarune then
             self.GUIVertOffset = -63
             self.bottombar.y = -33
@@ -1011,6 +1049,12 @@ return (function()
         unescape = false
         self.inbattle = true
     end
+	
+	function callback()
+		self.backcover.alpha = 0
+		self.transfrombattle = true
+		self.transdir = false
+	end
 
     -- Unloads the Player
     function self.unloadplayer(player)
