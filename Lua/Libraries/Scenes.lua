@@ -7,6 +7,7 @@ return (function()
     self.timergoal = 0
     self.timerscene = false
     self.startedtimer = false
+    self.justfinished = false
     function self.Delay(delay,scene)
         self.timergoal = delay
         self.timer = 0
@@ -31,6 +32,7 @@ return (function()
     end
     function self.Stop()
         self.current = false
+        self.justfinished = true
     end
     function self.Update()
         if self.startedtimer then

@@ -554,7 +554,7 @@ return (function()
             self.UpdateMapEvents()
             self.UpdateCurrentMap()
             self.UpdateRoomTransition()
-            if (not Scenes.current) and (not self.transtoroom) then
+            if (not Scenes.current) and (not self.transtoroom) and (not Scenes.justfinished) then
                 if Input.Confirm == 1 then
                     self.ConfirmEventInteraction()
                 end
@@ -573,6 +573,9 @@ return (function()
             end
 
             self.UpdatePlayer()
+            if (Scenes.justfinished) then
+                Scenes.justfinished = false
+            end
         end
     end
 
